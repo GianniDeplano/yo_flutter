@@ -1,10 +1,12 @@
 {
-  "name": "jupiter-cli",
+  "name": "jupiter",
   "version": "1.0.0",
   "description": "",
+  "bin": "dist/app.js",
   "main": "dist/app.js",
   "scripts": {
     "start": "tsc && node dist/app.js",
+    "build": "tsc -b",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Gianni Deplano",
