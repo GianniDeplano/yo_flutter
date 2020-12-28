@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import {Log}  from './utils/log';
 import {Banner}  from './utils/banner';
 import {NewProjectCli}  from './newproject/index';

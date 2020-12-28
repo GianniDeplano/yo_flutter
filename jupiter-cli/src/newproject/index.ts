@@ -1,5 +1,6 @@
 import {Log}  from '../utils/log';
 import {CheckEnvironment} from './check';
+import {CreateProject} from './create';
 import inquirer = require('inquirer');
 
 
@@ -33,7 +34,9 @@ export class NewProjectCli {
 
     do_action(answers): void {
         switch(answers.project) {
-            case ACTION_CREATE: break;
+            case ACTION_CREATE: 
+                new CreateProject().start();
+                break;
             case ACTION_SINGLE_PLATFORM: break;
             case ACTION_CHECK: 
                 new CheckEnvironment().start();
