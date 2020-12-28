@@ -1,0 +1,16 @@
+{
+  "name": "jupiter-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/app.js",
+  "scripts": {
+    "start": "tsc && node dist/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gianni Deplano",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "tslint": "^6.1.3",
+    "typescript": "^4.1.3"
+  }
+}
