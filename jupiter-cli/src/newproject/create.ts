@@ -1,8 +1,6 @@
 import {Log}  from '../utils/log';
 import ora = require('ora');
 import inquirer = require('inquirer');
-import { isRegExp } from 'util';
-import { exit } from 'process';
 const { spawn } = require('child_process');
 
 const STATES = {
@@ -11,6 +9,36 @@ const STATES = {
     2: 'END'
 };
 
+const LIBS = {
+    'Essentials': {
+        deps: ['url-launcher', 'keyboard_visibility', 'path_provider', 'permission_handler', 'http', 'shared_preferences'],
+        dev: ['flutter_launcher_icons']
+    },
+    'BLoC': {
+        deps: ['flutter_bloc', 'equatable', 'intl'],
+        dev: []
+    },
+    'Swagger To Code': {
+        deps: ['chopper'],
+        dev: ['chopper_generator', 'json_annotation', 'json_serializable','swagger_dart_code_generator']
+    },
+    'PDF': {
+        deps: ['flutter_pdfview'],
+        dev: []
+    },
+    'Webview': {
+        deps: ['flutter_inappwebview'],
+        dev: []
+    },
+    'Database': {
+        deps: [],
+        dev: []
+    },
+    'Sharing': {
+        deps: ['share'],
+        dev: []
+    },
+}
 export class CreateProject {
 
     state:number = 0;
@@ -101,38 +129,35 @@ export class CreateProject {
             type: 'checkbox',
             message: 'Select Libraries',
             name: 'libs',
-            choices: [  
-                //new inquirer.Separator(' = All = '),
-                //{ name: 'all-bloc-with-http' },
-                new inquirer.Separator(' = Essentials = '),
-                { name: 'url-launcher' },
-                //{ name: 'cupertino_icons' },
-                { name: 'keyboard_visibility' },
-                { name: 'path_provider' },
-                { name: 'permission_handler' },
-                new inquirer.Separator(' = Networking = '),
-                { name: 'http' },
-                new inquirer.Separator(' = Architecture = '),
-                { name: 'flutter_bloc'},
-                new inquirer.Separator(' = Extra = '),
-                { name: 'flutter_pdfview' },
-                { name: 'flutter_inappwebview' },
-                { name: 'share' },
-                { name: 'shared_preferences' },
-            ],
-            
+            choices: Object.keys(LIBS),
         },
         ])
         .then((answers:any) => {
-
             //Recursive install
-            this._install_lib(0, answers.libs);
+            var libs = []
+            var dev = []
+
+            for(var index in answers.libs) {
+                libs = [].concat(libs, LIBS[answers.libs[index]]['deps']);
+                dev = [].concat(dev, LIBS[answers.libs[index]]['dev']);
+            }
+
+            this._install_lib(0, libs, false, () => {
+                Log.t("Install DEV Libs", Log.WARN);
+                this._install_lib(0, dev, true);
+            });
         });
     }
 
-    _install_lib(index, libs): void {
+    _install_lib(index, libs, dev:boolean= false, cb:Function = undefined): void {
 
         if(libs.length == index) {
+
+            if(cb != undefined) {
+                cb();
+                return;
+            }
+
             Log.t("Install libs finished", Log.WARN);
 
             this.state += 1;
@@ -143,10 +168,14 @@ export class CreateProject {
 
         this.spinner = ora('Install package ' + libs[index]).start();
         var cmd = [].concat(['install'], libs[index]);
+
+        if(dev) {
+            cmd = [].concat(cmd, ['--dev']);
+        }
                 
         this._doCmd('get', cmd, {cwd: 'mynewproject'}, true, () => {
             this.spinner.stop();
-            this._install_lib(index+1, libs);
+            this._install_lib(index+1, libs, dev, cb);
         });
     }
 }
